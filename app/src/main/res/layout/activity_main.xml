@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<LinearLayout-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    tools:contest=".MainActivity"-->
+<!--    android:orientation="vertical"-->
+<!--    >-->
+<!--    <Button-->
+<!--        android:layout_width="250dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Capture Video"-->
+<!--        android:onClick="captureVideo"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:layout_marginTop="55dp"-->
+<!--        />-->
+
+<!--    <Button-->
+<!--        android:layout_width="250dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Play Video"-->
+<!--        android:onClick="playVideo"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:layout_marginTop="55dp"-->
+<!--        />-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical">
+    <!--    <ToggleButton-->
+    <!--        android:id="@+id/toggleRecordingButton"-->
+    <!--        android:layout_width="fill_parent"-->
+    <!--        android:textOff="Start Record"-->
+    <!--        android:textOn="Recording . . ."-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        />-->
+    <Button
+        android:id="@+id/recordButton"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:onClick="playVideo"
+        android:text="Record Video" />
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <SurfaceView
+            android:id="@+id/surfaceView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        </SurfaceView>
+
+    </FrameLayout>
+</LinearLayout>
+
+<!--</LinearLayout>-->
+<!--<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    tools:context=".MainActivity">-->
+
+<!--    <com.google.android.material.appbar.AppBarLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:theme="@style/AppTheme.AppBarOverlay">-->
+
+<!--        <androidx.appcompat.widget.Toolbar-->
+<!--            android:id="@+id/toolbar"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="?attr/actionBarSize"-->
+<!--            android:background="?attr/colorPrimary"-->
+<!--            app:popupTheme="@style/AppTheme.PopupOverlay" />-->
+
+<!--    </com.google.android.material.appbar.AppBarLayout>-->
+
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/fab"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="bottom|end"-->
+<!--        android:layout_margin="@dimen/fab_margin"-->
+<!--        app:srcCompat="@android:drawable/ic_dialog_email" />-->
+
+<!--    <include layout="@layout/content_main" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/textView2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="text"-->
+<!--        tools:layout_editor_absoluteX="280dp"-->
+<!--        tools:layout_editor_absoluteY="146dp" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/textViewResponse2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="text reponse"-->
+<!--        tools:layout_editor_absoluteX="72dp"-->
+<!--        tools:layout_editor_absoluteY="48dp" />-->
+
+<!--</androidx.coordinatorlayout.widget.CoordinatorLayout>-->
+
