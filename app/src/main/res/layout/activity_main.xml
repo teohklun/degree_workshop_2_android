@@ -28,8 +28,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FFFFFF"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:screenOrientation="landscape"
+    android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+    >
     <!--    <ToggleButton-->
     <!--        android:id="@+id/toggleRecordingButton"-->
     <!--        android:layout_width="fill_parent"-->
@@ -37,6 +41,20 @@
     <!--        android:textOn="Recording . . ."-->
     <!--        android:layout_height="wrap_content"-->
     <!--        />-->
+<!--    <com.victor.loading.rotate.RotateLoading-->
+<!--        android:id="@+id/rotateloading"-->
+<!--        android:layout_width="80dp"-->
+<!--        android:layout_height="80dp"-->
+<!--        android:layout_gravity="center"/>-->
+
+    <com.victor.loading.book.BookLoading
+        android:id="@+id/bookloading"
+        android:layout_marginTop="20dp"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:visibility="invisible"
+        android:layout_gravity="center" />
+
     <Button
         android:id="@+id/recordButton"
         android:layout_width="250dp"
@@ -55,7 +73,12 @@
             android:layout_height="fill_parent">
 
         </SurfaceView>
-
+<!--        <androidx.appcompat.widget.Toolbar-->
+<!--            android:id="@+id/toolbar"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="?attr/actionBarSize"-->
+<!--            android:background="?attr/colorPrimary"-->
+<!--            app:popupTheme="@style/AppTheme.PopupOverlay" />-->
     </FrameLayout>
 </LinearLayout>
 
@@ -72,12 +95,7 @@
 <!--        android:layout_height="wrap_content"-->
 <!--        android:theme="@style/AppTheme.AppBarOverlay">-->
 
-<!--        <androidx.appcompat.widget.Toolbar-->
-<!--            android:id="@+id/toolbar"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="?attr/actionBarSize"-->
-<!--            android:background="?attr/colorPrimary"-->
-<!--            app:popupTheme="@style/AppTheme.PopupOverlay" />-->
+
 
 <!--    </com.google.android.material.appbar.AppBarLayout>-->
 
