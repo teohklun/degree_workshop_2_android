@@ -53,7 +53,8 @@ public class SoundVisual extends AppCompatActivity {
 //        mLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(0, 200, 0, 0);
+//        layoutParams.setMargins(0, 200, 0, 0);
+        layoutParams.setMargins(0, 450, 0, 0);
 //        layoutParams.gravity = Gravity.CENTER;
         mLinearLayout.addView(mStatusTextView);
         Intent intent = getIntent();

@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -61,7 +62,10 @@ public class MainActivity extends Activity {
 //    private static final String urlServer = "http://10.200.51.29:5000/"; //kasturi ipv4
 
 //    private static final String urlServer = "http://192.168.0.137:5000/"; //lun cellular data
-    private static final String urlServer = "http://192.168.43.9:5000/"; //lun cellular data
+//private static final String urlServer = "http://192.168.43.9:5000/"; //lun cellular data
+//    private static final String urlServer = "http://192.168.43.31:5000/"; //lun cellular data
+    private static final String urlServer = "http://192.168.0.137:5000/"; //ica2
+
 
     private static final int sound_response_code = 99;
     private static final int file_server_response_code = 100;
@@ -80,6 +84,8 @@ public class MainActivity extends Activity {
     private final HashMap unHappySoundMap = getUnhappyHashMap();
     private final HashMap actionHahsMap = getActionsHashMap();
     private final HashMap actioneutralSoundMap = getNeutralHashMap();
+
+    private MediaPlayer mpBgFlower;
 
     private int loopOfEmotionFace = 0;
 
@@ -109,8 +115,8 @@ public class MainActivity extends Activity {
         unhappysound_1,
     }
 
-    private final String HappyPick = " pick for flower";
-    private final String SadPick = " pick for chocolate";
+    private final String HappyPick = "pick for flower";
+    private final String SadPick = "pick for chocolate and release EO";
     private final String confirmHappy = "confirm as happy";
     private final String confirmSad = " confirm as sad";
     private final String confirmNeutral = " confirm as neutral";
@@ -129,6 +135,8 @@ public class MainActivity extends Activity {
 //            getSupportActionBar().setHomeButtonEnabled(false);
 //        }
         setContentView(R.layout.main);
+//        ImageView img= (ImageView) findViewById(R.id.image1);
+//        img.setImageDrawable();
 //        requestWindowFeature(Window.FEATURE_NO_TITLE);//will hide the title
 //        getActionBar().hide(); //hide the title bar
 //        Display display = ((WindowManager)this.getSystemService(this.WINDOW_SERVICE)).getDefaultDisplay();
@@ -138,8 +146,9 @@ public class MainActivity extends Activity {
 //        else {
 //            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        }
-        startIntentSound(R.raw.hello, "please_record");
-
+//        startIntentSound(R.raw.hello, "please_record");
+        startIntentSound(R.raw.a, "videoCapture");
+//        startIntentSound(R.raw.hello_robot, "videoCapture");
     }
 
     public void onResume() {
@@ -147,9 +156,60 @@ public class MainActivity extends Activity {
 //        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
-    public void processLoading(Boolean on, String text){
+    public void processEmotionImage(final String emotion){
+
+        new Handler(Looper.getMainLooper()).post(new Runnable(){
+
+            @Override
+            public void run() {
+                ImageView img= (ImageView) findViewById(R.id.image);
+                BookLoading bookLoading = findViewById(R.id.bookloading);
+                bookLoading.setVisibility(View.GONE);
+                if(emotion.equals("happy")) {
+                    img.setImageResource(R.drawable.happy);
+                } else if(emotion.equals("sad")) {
+                    img.setImageResource(R.drawable.sad);
+                } else if(emotion.equals("neutral")) {
+                    img.setImageResource(R.drawable.neutral);
+                } else {
+                    Log.e("undefined", "error image");
+                }
+                img.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+//        img.setImageResource(R.drawable.happy);
+
+    }
+
+    public void showEmotionImage(){
+        new Handler(Looper.getMainLooper()).post(new Runnable(){
+
+            @Override
+            public void run() {
+                ImageView img= (ImageView) findViewById(R.id.image);
+                img.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    public void hideEmotionImage(){
+        new Handler(Looper.getMainLooper()).post(new Runnable(){
+
+            @Override
+            public void run() {
+                ImageView img= (ImageView) findViewById(R.id.image);
+                img.setVisibility(View.GONE);
+
+            }
+        });
+    }
+
+
+    public void processLoading(Boolean on, String text, boolean playSound){
         setInfoText(text);
-        if(on) startLoading();
+        if(on) startLoading(playSound);
         else stopLoading();
     }
 
@@ -161,19 +221,31 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void startLoading() {
-        final MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.a_little_progress);
-        new Handler(Looper.getMainLooper()).post(new Runnable(){
-            @Override
-            public void run() {
-                BookLoading bookLoading = findViewById(R.id.bookloading);
-                mp.start();
-                bookLoading.start();
-                bookLoading.setVisibility(View.VISIBLE);
+    public void startLoading(boolean playSound) {
+        if(playSound) {
+            final MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.please_wait_while_your_emotion);
+            new Handler(Looper.getMainLooper()).post(new Runnable(){
+                @Override
+                public void run() {
+                    BookLoading bookLoading = findViewById(R.id.bookloading);
+                    mp.start();
+                    bookLoading.start();
+                    bookLoading.setVisibility(View.VISIBLE);
 //                bookLoading.setVisibility(View.GONE);
 //                stopXMSecForDisplay(3000);
-            }
-        });
+                }
+            });
+        } else {
+            new Handler(Looper.getMainLooper()).post(new Runnable(){
+                @Override
+                public void run() {
+                    BookLoading bookLoading = findViewById(R.id.bookloading);
+                    bookLoading.start();
+                    bookLoading.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+
     }
 
     public void stopLoading(){
@@ -201,31 +273,39 @@ public class MainActivity extends Activity {
         });
     }
 
-    public void updateProgressBar(int size){
-        ProgressBar progressBar = findViewById(R.id.progressBar);
-//        progressBar.setIndeterminate(true);
-        if(progressBar.getVisibility() != View.VISIBLE){
-            progressBar.setVisibility(View.VISIBLE);
-        }
-        progressBar.setProgress(size);
-    }
-
-    public void hideProgressBar(){
-        ProgressBar progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.INVISIBLE);
-    }
-
-    public void setInfoText(final String text, final Boolean stop) {
+    public void setInfoText(final String text, final int time) {
         new Handler(Looper.getMainLooper()).post(new Runnable(){
             @Override
             public void run() {
                 TextView infoText = findViewById(R.id.textView);
                 infoText.setText(text);
-                if(stop){
-                    stopXMSecForDisplay(3000);
-                }
+                stopXMSecForDisplay(time);
             }
         });
+    }
+
+    public void updateProgressBar(final int size){
+        new Handler(Looper.getMainLooper()).post(new Runnable(){
+            @Override
+            public void run() {
+                ProgressBar progressBar = findViewById(R.id.progressBar);
+                if(progressBar.getVisibility() != View.VISIBLE){
+                    progressBar.setVisibility(View.VISIBLE);
+                }
+                progressBar.setProgress(size);
+            }
+        });
+    }
+
+    public void hideProgressBar(){
+        new Handler(Looper.getMainLooper()).post(new Runnable(){
+            @Override
+            public void run() {
+                ProgressBar progressBar = findViewById(R.id.progressBar);
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        });
+
     }
 
     public void startIntentSound(int soundID, String nextAction) {
@@ -244,18 +324,14 @@ public class MainActivity extends Activity {
         startActivity(playIntent);
     }
 
+    public void recordVideo(){
+        Log.e("99", "request save video activities");
+        Intent intent2 = new Intent(this, SurfaceCamera.class);
+        startActivityForResult(intent2, file_server_response_code);
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VIDEO_REQUEST && resultCode == RESULT_OK) {
-//            videoUri = data.getData();
-            Log.w("finish", "here");
-            String url = urlServer + "api_speech";
-//            String path = recordAudioPath;
-            String path = recordVideoPath;
-//            new sendFilesToServerAsync("happy", path).execute(url);
-            new sendFilesToServerAsync("face",
-                    recordVideoPath).execute(urlServer + "api_emo_face");
-        }
         switch (resultCode) {
             case (sound_response_code):
                 String action = "";
@@ -265,26 +341,23 @@ public class MainActivity extends Activity {
                 } else {
                     Log.e("error", "data no extra");
                 }
-                if (action.equals("please_record")) {
-                    introCaptureVideo();
-                } else if (action.equals("videoCapture")) {
-                    Log.e("99", "request save video activities");
-                    Intent intent2 = new Intent(this, SurfaceCamera.class);
-                    startActivityForResult(intent2, file_server_response_code);
+//                if (action.equals("please_record")) {
+//                    introCaptureVideo();
+//                }
+                if (action.equals("videoCapture")) {
+                    recordVideo();
+//                    Log.e("99", "request save video activities");
+//                    Intent intent2 = new Intent(this, SurfaceCamera.class);
+//                    startActivityForResult(intent2, file_server_response_code);
                 } else if (action.equals(NeutralAction.neutralsound_1.toString())) {
                     //end here
-                    startIntentSound(R.raw.end, "end");
-//                    startIntentSound(R.raw.neutral_end, NeutralAction.neutralsound_2.toString());
-                } else if (action.equals(NeutralAction.neutralsound_2.toString())) {
-//                    processLoading(false, "Part neutral completed");
-                    Log.e(NeutralAction.neutralsound_2.toString(), "now end at neutral part");
-                } else if (action.equals(HappyAction.happysound_1.toString())) {
-                    if(canProceedConfirm()) processTriggerPick(HappyPick);
-                    else confirmEmotion(confirmHappy);
-                } else if (action.equals(UnHappyAction.unhappysound_1.toString())) {
-                    if(canProceedConfirm()) processTriggerPick(SadPick);
-                    else confirmEmotion(confirmSad);
-                } else if (action.equals("repeat_1_happy")) {
+//                    partSoundEnd();
+                    startIntentSound(getRandomValueFromHashMap(getNeutralHashMap()), "semi_end");
+                } else if (action.equals(HappyPick)) {
+                    tryProcessPick(action);
+                } else if (action.equals(SadPick)) {
+                    tryProcessPick(action);
+                } else if (action.equals("repeat_1_happy")) { // repeat pick process
                     recordAudio(HappyPick);
                 } else if (action.equals("repeat_1_sad")) {
                     recordAudio(SadPick);
@@ -292,43 +365,87 @@ public class MainActivity extends Activity {
                     playSoundWantMore(HappyPick);
                 } else if (action.equals("want_more_sad")) {
                     playSoundWantMore(SadPick);
-                } else if (action.equals("confirm_happy")){
+                } else if (action.equals("confirm_happy")){ //confirm as what emotion
                     recordAudio(confirmHappy);
-                } else if (action.equals("confirm_sad")){
+                } else if (action.equals("confirm_sad")){//confirm as what emotion
                     recordAudio(confirmSad);
-                } else if (action.equals("confirm_neutral")){
-                    recordAudio(confirmNeutral);
+                } else if (action.equals("confirm_happy")) {//confirm as what emotion
+                    recordAudio(confirmSad);
+                }
+                else if (action.equals("confirm_neutral")){
+                    playSoundEmotion("neutral");
                 } else if (action.equals("repeat_confirm_happy")){
-                    confirmEmotion(confirmHappy);
+                    playSoundEmotion("happy");
                 } else if (action.equals("repeat_confirm_sad")){
-                    confirmEmotion(confirmSad);
-                } else if (action.equals("repeat_confirm_neutral")){
-                    confirmEmotion(confirmNeutral);
+                    playSoundEmotion("sad");
+                } else if (action.equals("emotion_confirm_YN_happy")){
+                    soundYesNo("confirm_happy");
+                } else if (action.equals("emotion_confirm_YN_sad")){
+                    soundYesNo("confirm_sad");
+                } else if (action.equals("emotion_confirm_YN_neutral")){
+                    soundYesNo("confirm_neutral");
+                } else if(action.equals("end")) {
+                    setInfoText("This is the end of the robot.");
+                } else if (action.equals("semi_end")){
+                    partSoundEnd();
                 }
                 else if (action.equals("repeat_1")) {
                 }else{
-                    Log.e("Error", "undefined");
+
+                    Log.e("Error", "undefined" + action);
                 }
                 break;
             case (100):
                 Log.e("100", "sending to server");
                 setInfoText("Video recorded");
-                new sendFilesToServerAsync("recognition of face ",
+//                new sendFilesToServerAsync("recognition of face ",
+//                        recordVideoPath).execute(urlServer + "api_emo_face");
+                new sendVideoToServerAsync("recognition of face ",
                         recordVideoPath).execute(urlServer + "api_emo_face");
                 break;
         }
     }
 
     public void introCaptureVideo(){
-        startIntentSound(R.raw.please_record, "videoCapture");
+        recordVideo();
+//        startIntentSound(R.raw.no, "videoCapture");
     }
+
+    public void tryProcessPick(String actionString){
+
+        if(actionString.equals(HappyPick)) {
+            processTriggerPick(HappyPick);
+        } else if (actionString.equals(SadPick)){
+            processTriggerPick(SadPick);
+        }
+
+//        if(actionString.equals(HappyAction.happysound_1.toString())) {
+//            if(canProceedConfirm()) processTriggerPick(HappyPick);
+//            else confirmEmotion(confirmHappy);
+//        }else if(actionString.equals(UnHappyAction.unhappysound_1.toString())){
+//            if(canProceedConfirm())  {
+//                mpBgFlower = MediaPlayer.create(MainActivity.this, R.raw.bg_music);
+//                processTriggerPick(SadPick);
+//            }
+//            else confirmEmotion(confirmSad);
+//        }
+    }
+
+
 
     public void confirmEmotion(String emotion){
         loopOfEmotionFace++;
-        if(emotion.equals(confirmHappy)) startIntentSound(R.raw.confirm_happy, "confirm_happy");
-        else if(emotion.equals(confirmSad)) startIntentSound(R.raw.confirm_sad, "confirm_sad");
-        else if(emotion.equals(confirmNeutral))startIntentSound(R.raw.confirm_neutral, "confirm_neutral");
+        if(emotion.equals(confirmHappy))soundYesNo(HappyAction.happysound_1.toString());
+        else if(emotion.equals(confirmSad))soundYesNo(UnHappyAction.unhappysound_1.toString());
+        else if(emotion.equals(confirmNeutral))soundYesNo(NeutralAction.neutralsound_1.toString());
+//        if(emotion.equals(confirmHappy)) startIntentSound(R.raw.pls_respond_yes_no, "emotion_confirm_YN_happy");
+//        else if(emotion.equals(confirmSad)) startIntentSound(R.raw.pls_respond_yes_no, "emotion_confirm_YN_sad");
+//        else if(emotion.equals(confirmNeutral))startIntentSound(R.raw.pls_respond_yes_no, "emotion_confirm_YN_neutral");
         else Log.e("error_confirm", "emotion undefined.");
+    }
+
+    public void soundYesNo(String action){
+        startIntentSound(R.raw.pls_respond_yes_no, action);
     }
 
     public boolean canProceedConfirm(){
@@ -415,6 +532,7 @@ public class MainActivity extends Activity {
     }
 
     public void processResponse(JSONObject responseJson) throws JSONException {
+        Log.d("response place", "response method2");
         updateProgressBar(99);
         stopXMSecForDisplay(1000);
         Log.d("response place", "response method");
@@ -422,8 +540,9 @@ public class MainActivity extends Activity {
         String result = responseJson.get("result").toString();
 
         if(action.equals("api_emo_face")) {
-            processLoading(false, "Recognized as : " + result + " face");
-
+            processEmotionImage(result);
+            processLoading(false, "Recognized as : " + result + " face", false);
+//            processEmotionImage(result);
             if(result.equals(Emotion.happy.toString())) {
                 partHappy();
             } else if(result.equals("sad")) {
@@ -437,34 +556,89 @@ public class MainActivity extends Activity {
         } else if(action.equals("pick")) { // picking
 
             String actionType = responseJson.get("actionType").toString();
-            processLoading(false, "Finish for " + actionType);
-            playSoundWantMore(actionType);
+            processLoading(false, "Finish for " + actionType, false);
+            Log.e("testlog", actionType );
+            if(actionType.equals(HappyPick)){
+                new Handler(Looper.getMainLooper()).post(new Runnable(){
+                    @Override
+                    public void run() {
+                        mpBgFlower.stop();
+                        mpBgFlower.release();
+                    }
+                });
+                startIntentSound(R.raw.take_flower,"semi_end");
+//                playSoundWantMore(actionType);
+            } else {
+                Log.e("testlog2", "sad pick" );
+                playSoundWantMore(actionType);
+
+//                startIntentSound(R.raw.take_cho, "semi_end");
+                //sad
+//                startIntentSound(R.raw.take_flower,"end");
+//                processActionSufficient();
+            }
+
+//                            mpBgFlower.stop();
+//                mpBgFlower.release();
+//                playSoundWantMore(actionType);
+//            startIntentSound(R.raw.take_flower, "semi_end");
+
+
         } else if(action.equals("api_speech")){
             stopLoading();
             String actionType = responseJson.get("actionType").toString();
             if(result.equals("1")) {
-                processLoading(false, "Detected speech as YES");
+                processLoading(false, "Detected speech as YES", false);
 //                setInfoText("Detected speech as YES");
                 //yes
 
                 //dirty method
-                if(isActionConfirm(actionType))processConfirmAs("yes", actionType);
-                else processActionWantMore(actionType);
+                Log.e("test actionType", actionType);
+//                if(isActionConfirm(actionType))processConfirmAs("yes", actionType);
+//                else processActionWantMore(actionType);
+
+                if(actionType.equals(HappyPick)) {
+                    processActionWantMore(actionType);
+                } else if(actionType.equals(SadPick)) {
+                    processActionWantMore(actionType);
+                } else {
+                    // do the check confirm
+                }
+
             }else if(result.equals("2")){
-                processLoading(false, "Detected speech as NO");
+                processLoading(false, "Detected speech as NO", false);
 //                setInfoText("Detected speech as NO");
-                if(isActionConfirm(actionType))processConfirmAs("no", actionType);
-                else processActionSufficient(actionType);
-                //no
-                // logic next step or end
+//                if(isActionConfirm(actionType))processConfirmAs("no", actionType);
+////                else processActionSufficient(actionType);
+//                else partSoundEnd();
+
+                if(actionType.equals(HappyPick)) {
+                    startIntentSound(R.raw.take_flower,"semi_end");
+                } else if(actionType.equals(SadPick)) {
+                    startIntentSound(R.raw.take_cho,"semi_end");
+                } else {
+                    // do the check confirm
+                }
             }
             else {
-                processLoading(false, "Could not recognize speech as YES or NO");
-                if(isActionConfirm(actionType))processConfirmAs("fail", actionType);
-//                setInfoText("Could not recognize speech as YES or NO");
-                //could not detect properly
-                else {
-                        final String finalActionType = actionType;
+                processLoading(false, "Could not recognize speech as YES or NO", false);
+//                if(isActionConfirm(actionType))processConfirmAs("fail", actionType);
+////                setInfoText("Could not recognize speech as YES or NO");
+//                //could not detect properly
+//                else {
+//                        final String finalActionType = actionType;
+//                    new Timer().schedule(new TimerTask() {
+//                        @Override
+//                        public void run() {
+//
+//                            // run AsyncTask here.
+//                            processActionRepeatVoice(finalActionType);
+//                        }
+//                    }, 5000);
+//                }
+
+                if(actionType.equals(HappyPick)) {
+                    final String finalActionType = actionType;
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
@@ -473,6 +647,17 @@ public class MainActivity extends Activity {
                             processActionRepeatVoice(finalActionType);
                         }
                     }, 5000);
+                } else if(actionType.equals(SadPick)) {
+                    final String finalActionType = actionType;
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+
+                            // run AsyncTask here.
+                            processActionRepeatVoice(finalActionType);
+                        }
+                    }, 5000);                } else {
+                    // do the check confirm
                 }
             }
         } else {
@@ -489,18 +674,23 @@ public class MainActivity extends Activity {
 
     public void processConfirmAs(String detectAnswer, String actionType){
         if(detectAnswer.equals("yes")) {
-            if(actionType.equals(confirmHappy)) startIntentSound(R.raw.happy, HappyAction.happysound_1.toString());
+            if(actionType.equals(confirmHappy)) startIntentSound(R.raw.your_emotion_is_happy, HappyAction.happysound_1.toString());
 //                processTriggerPick(HappyPick);
-            else if (actionType.equals(confirmSad)) startIntentSound(R.raw.confirm_sad, UnHappyAction.unhappysound_1.toString());
+            else if (actionType.equals(confirmSad)) startIntentSound(R.raw.your_emotion_is_sad, UnHappyAction.unhappysound_1.toString());
 //                processTriggerPick(SadPick);
             else if (actionType.equals(confirmNeutral)) partNeutral();
         } else if (detectAnswer.equals("no")){
-            introCaptureVideo();
+            recordVideo();
+//            introCaptureVideo();
         } else if (detectAnswer.equals("fail")) {
             loopOfEmotionFace--;
-            if (actionType.equals(confirmHappy)) startIntentSound(R.raw.please_repeat, "repeat_confirm_happy");
-            if (actionType.equals(confirmSad)) startIntentSound(R.raw.please_repeat, "repeat_confirm_sad");
-            if (actionType.equals(confirmNeutral)) startIntentSound(R.raw.please_repeat, "repeat_confirm_neutral");
+            if(actionType.equals(confirmHappy))soundYesNo("confirm_happy");
+            if(actionType.equals(confirmSad))soundYesNo("confirm_sad");
+            if(actionType.equals(confirmNeutral))soundYesNo("confirm_neutral");
+
+//            if (actionType.equals(confirmHappy)) startIntentSound(R.raw.we_cannot_detect, "repeat_confirm_happy");
+//            if (actionType.equals(confirmSad)) startIntentSound(R.raw.we_cannot_detect, "repeat_confirm_sad");
+//            if (actionType.equals(confirmNeutral)) startIntentSound(R.raw.we_cannot_detect, "repeat_confirm_neutral");
         }
     }
 
@@ -514,6 +704,8 @@ public class MainActivity extends Activity {
 
 //        }else if (action.equals(Emotion.happy.toString())) {
         }else if (action.equals(HappyPick)) {
+            mpBgFlower = MediaPlayer.create(MainActivity.this, R.raw.bg_music);
+            mpBgFlower.start();
             //function to move robot arm etc
             //do the retrigger the mediarecorder
             new asyncRequestPick(action).execute(); // should be do in function to move robot arm
@@ -524,30 +716,43 @@ public class MainActivity extends Activity {
     }
 
     public void processActionWantMore(final String action) {
-        startIntentSound(R.raw.yes_more, action.equals(Emotion.happy.toString()) ? HappyAction.happysound_1.toString() : UnHappyAction.unhappysound_1.toString());
+        tryProcessPick(action);
+//        startIntentSound(R.raw.yes_more, action.equals(Emotion.happy.toString()) ? HappyAction.happysound_1.toString() : UnHappyAction.unhappysound_1.toString());
     }
 
-    public void processActionSufficient(String action){
+    public void partSoundEnd(){
+        showEmotionImage();
+        hideProgressBar();
+        startIntentSound(R.raw.thats_all_thank_u, "end");
+    }
 
+    public void processActionSufficient(){
+        setInfoText("This is the end of the robot.");
     }
 
     public void playSoundWantMore(String actionType){
         String temp_nextAction;
         if(actionType.equals(HappyPick)) {
             temp_nextAction = "repeat_1_happy";
-        } else {
+        } else if(SadPick.equals(actionType)) {
             temp_nextAction = "repeat_1_sad";
         }
+        else {
+            temp_nextAction = "asdass";
+            Log.e("asdasd", "bug");
+
+        }
+//        else {
+//            temp_nextAction = "repeat_1_sad";
+//        }
         final String nextAction = temp_nextAction;
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-
                 // run AsyncTask here.
                 startIntentSound(R.raw.want_more, nextAction);
             }
         }, 5000);
-
     }
 
 
@@ -577,10 +782,11 @@ public class MainActivity extends Activity {
 
         protected void onPreExecute() {
             super.onPreExecute();
+            hideEmotionImage();
             if(TextUtils.isEmpty(actionText)) {
-                processLoading(true, "Processing for " + action + " please be patient . . .");
+                processLoading(true, "Processing for " + action + " please be patient . . .",false);
             } else {
-                processLoading(true, "Processing for " + actionText + " please be patient . . .");
+                processLoading(true, "Processing for " + actionText + " please be patient . . .", false);
             }
         }
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -629,6 +835,81 @@ public class MainActivity extends Activity {
             super.onPostExecute(aVoid);
         }
     }
+
+    public class sendVideoToServerAsync extends AsyncTask<String, Integer, Void> {
+
+        String action;
+        String filePath;
+        String actionText;
+        protected void onProgressUpdate(Integer... values){
+            updateProgressBar(values[0]);
+        }
+        private sendVideoToServerAsync(String action, String filePath) {
+            this.action  = action;
+            this.filePath = filePath;
+        }
+
+        private sendVideoToServerAsync(String action, String filePath, String actionPass) {
+            this.action  = action;
+            this.actionText  = actionPass;
+            this.filePath = filePath;
+        }
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if(TextUtils.isEmpty(actionText)) {
+                processLoading(true, "Processing for " + action + " please be patient . . .",true);
+            } else {
+                processLoading(true, "Processing for " + actionText + " please be patient . . .", true);
+            }
+        }
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+        @Override
+        protected Void doInBackground(final String... strings) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+//                        sendFilesToServer(action, filePath, strings);
+                        publishProgress(25);
+
+                        URL url = null;
+                        StringBuilder response = null;
+                        try {
+                            url = new URL(strings[0]);
+                            File file = new File(filePath);
+                            HttpURLConnection conn = initConnection(url);
+
+                            writeFilesParamToDataOutputStream(conn, file, action);
+                            response = readServerResponse(conn);
+                            publishProgress(50);
+
+                            try {
+                                JSONObject responseJson = new JSONObject(response.toString());
+
+                                Log.d("response", (String) responseJson.get("result").toString() + "HERE!!!");
+                                publishProgress(75);
+                                processResponse(responseJson);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+//            buttonChoose.setText("Fail message response!!!");
+                            Log.d("response fail", "Fail message response!!!");
+                        }
+                    }
+                }, 4000);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
 
     public void initPermisison(){
         if (Build.VERSION.SDK_INT >= 23) {
@@ -691,7 +972,8 @@ public class MainActivity extends Activity {
         protected void onPreExecute(){
 //            setInfoText("doing for " + action);
 //            startLoading();
-            processLoading(true, "Processing for " + action + " please be patient . . .");
+            hideEmotionImage();
+            processLoading(true, "Processing for " + action + " please be patient . . .",false);
         }
 
         protected void onProgressUpdate(Integer... values){
@@ -746,15 +1028,19 @@ public class MainActivity extends Activity {
         //show generate random sound
 //        MediaPlayer mpHappy = MediaPlayer.create(MainActivity.this, getRandomValueFromHashMap(unHappySoundMap));
         setInfoText("doing part happy");
-        startIntentSound(R.raw.happy, HappyAction.happysound_1.toString());
+        playSoundEmotion("happy");
+//        startIntentSound(R.raw.your_emotion_is_happy, HappyPick));
     }
 
     // play one more sound after emotion neutral
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public void partNeutral(){
         setInfoText("doing part neutral");
-        if(canProceedConfirm()) startIntentSound(getRandomValueFromHashMap(actioneutralSoundMap), NeutralAction.neutralsound_1.toString());
-        else confirmEmotion(confirmNeutral);
+//        if(canProceedConfirm()) startIntentSound(getRandomValueFromHashMap(actioneutralSoundMap), NeutralAction.neutralsound_1.toString());
+//        else confirmEmotion(confirmNeutral);
+
+        playSoundEmotion("neutral");
+
 //        startIntentSound(R.raw.neutral, NeutralAction.neutralsound_1.toString());
 //        startIntentSound(getRandomValueFromHashMap(actioneutralSoundMap), NeutralAction.neutralsound_1.toString());
     }
@@ -764,7 +1050,17 @@ public class MainActivity extends Activity {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public void partUnhappy(){
         setInfoText("doing part unhappy");
-        startIntentSound(R.raw.unhappy, UnHappyAction.unhappysound_1.toString());
+        playSoundEmotion("sad");
+    }
+
+    public void playSoundEmotion(String action) {
+        if(action.equals("sad")) {
+            startIntentSound(R.raw.your_emotion_is_sad, SadPick);
+        } else if(action.equals("happy")) {
+            startIntentSound(R.raw.your_emotion_is_happy, HappyPick);
+        } else if(action.equals("neutral")){
+            startIntentSound(R.raw.your_emotion_is_neutral, NeutralAction.neutralsound_1.toString());
+        }
     }
 
     public MediaPlayer getMediaPlayerWantMore(final String action){
@@ -783,39 +1079,45 @@ public class MainActivity extends Activity {
 
     public HashMap getActionsHashMap(){
         HashMap<String, Integer> actions = new HashMap<String, Integer>();
-        actions.put(Emotion.happy.toString(), R.raw.happy);
-        actions.put(Emotion.unhappy.toString(), R.raw.unhappy);
+        actions.put(Emotion.happy.toString(), R.raw.your_emotion_is_happy);
+        actions.put(Emotion.unhappy.toString(), R.raw.your_emotion_is_sad);
         actions.put(Emotion.repeat.toString(), R.raw.please_repeat);
         actions.put(Emotion.more.toString(), R.raw.want_more);
         actions.put(Emotion.yesMore.toString(), R.raw.yes_more);
-        actions.put(Emotion.neutral.toString(), R.raw.neutral);
-        actions.put(Emotion.neutralEnd.toString(), R.raw.neutral_end);
+        actions.put(Emotion.neutral.toString(), R.raw.your_emotion_is_neutral);
         return actions;
     }
 
     public HashMap getUnhappyHashMap(){
         HashMap<String, Integer> unhappySoundMap = new HashMap<String, Integer>();
-        unhappySoundMap.put("d", R.raw.d);
-        unhappySoundMap.put("e", R.raw.e);
-        unhappySoundMap.put("f", R.raw.f);
+//        unhappySoundMap.put("d", R.raw.d);
+//        unhappySoundMap.put("e", R.raw.e);
+//        unhappySoundMap.put("f", R.raw.f);
 
         return unhappySoundMap;
     }
 
     public HashMap getHappyHashMap(){
         HashMap<String, Integer> happySoundMap = new HashMap<String, Integer>();
-        happySoundMap.put("a", R.raw.a);
-        happySoundMap.put("b", R.raw.b);
-        happySoundMap.put("c", R.raw.c);
+//        happySoundMap.put("a", R.raw.a);
+//        happySoundMap.put("b", R.raw.b);
+//        happySoundMap.put("c", R.raw.c);
         return happySoundMap;
     }
 
     public HashMap getNeutralHashMap(){
-        HashMap<String, Integer> happySoundMap = new HashMap<String, Integer>();
-        happySoundMap.put("a", R.raw.randoma);
-        happySoundMap.put("b", R.raw.randomb);
-        happySoundMap.put("c", R.raw.randomc);
-        return happySoundMap;
+        HashMap<String, Integer> neutralSoundMap = new HashMap<String, Integer>();
+        neutralSoundMap.put("q_!", R.raw.q_1);
+        neutralSoundMap.put("q_2", R.raw.q_2);
+        neutralSoundMap.put("q_3", R.raw.q_3);
+        neutralSoundMap.put("q_4", R.raw.q_4);
+        neutralSoundMap.put("q_5", R.raw.q_5);
+        neutralSoundMap.put("q_6", R.raw.q_6);
+        neutralSoundMap.put("q_7", R.raw.q_7);
+        neutralSoundMap.put("q_8", R.raw.q_8);
+        neutralSoundMap.put("q_9", R.raw.q_9);
+        neutralSoundMap.put("q_10", R.raw.q_10);
+        return neutralSoundMap;
     }
 
     public int getRandomValueFromHashMap(HashMap soundMap){
@@ -831,7 +1133,7 @@ public class MainActivity extends Activity {
     }
 
     public void recordAudio(final String action){
-        setInfoText("Recording sound . . .");
+        setInfoText("Recording sound . . .",0);
         MediaRecorder recorder = initMediaPlayer();
         recorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
             @Override
@@ -862,7 +1164,8 @@ public class MainActivity extends Activity {
         recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         recorder.setOutputFile(path);
-        recorder.setMaxDuration(5000);
+//        recorder.setMaxDuration(2000);
+        recorder.setMaxDuration(2000);
         recorder.setAudioSamplingRate(44100);
         recorder.setAudioEncodingBitRate(1024 * 1024);
         return recorder;
