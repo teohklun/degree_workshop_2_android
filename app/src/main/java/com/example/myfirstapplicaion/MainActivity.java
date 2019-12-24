@@ -83,7 +83,7 @@ public class MainActivity extends Activity {
     private final HashMap happySoundMap = getHappyHashMap();
     private final HashMap unHappySoundMap = getUnhappyHashMap();
     private final HashMap actionHahsMap = getActionsHashMap();
-    private final HashMap actioneutralSoundMap = getNeutralHashMap();
+    private final HashMap actioeNutralSoundMap = getNeutralHashMap();
 
     private MediaPlayer mpBgFlower;
 
@@ -117,38 +117,19 @@ public class MainActivity extends Activity {
 
     private final String HappyPick = "pick for flower";
     private final String SadPick = "pick for chocolate and release EO";
+
     private final String confirmHappy = "confirm as happy";
     private final String confirmSad = " confirm as sad";
     private final String confirmNeutral = " confirm as neutral";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         initPermisison();
-//        Intent intent = new Intent(this, MediaRecorderActivity.class);
-//        startActivity(intent);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-//            getSupportActionBar().setHomeButtonEnabled(false);
-//        }
         setContentView(R.layout.main);
-//        ImageView img= (ImageView) findViewById(R.id.image1);
-//        img.setImageDrawable();
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);//will hide the title
-//        getActionBar().hide(); //hide the title bar
-//        Display display = ((WindowManager)this.getSystemService(this.WINDOW_SERVICE)).getDefaultDisplay();
-//        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        }
-//        else {
-//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        }
-//        startIntentSound(R.raw.hello, "please_record");
-        startIntentSound(R.raw.a, "videoCapture");
-//        startIntentSound(R.raw.hello_robot, "videoCapture");
+        startIntentSound(R.raw.hello_robot, "videoCapture");
     }
 
     public void onResume() {
@@ -156,15 +137,16 @@ public class MainActivity extends Activity {
 //        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
+    // make out emotion image based on emotion
+    // set loading book gone to make sure the position of book replace by the emotion
     public void processEmotionImage(final String emotion){
-
         new Handler(Looper.getMainLooper()).post(new Runnable(){
 
             @Override
             public void run() {
                 ImageView img= (ImageView) findViewById(R.id.image);
                 BookLoading bookLoading = findViewById(R.id.bookloading);
-                bookLoading.setVisibility(View.GONE);
+
                 if(emotion.equals("happy")) {
                     img.setImageResource(R.drawable.happy);
                 } else if(emotion.equals("sad")) {
@@ -174,13 +156,10 @@ public class MainActivity extends Activity {
                 } else {
                     Log.e("undefined", "error image");
                 }
+                bookLoading.setVisibility(View.GONE);
                 img.setVisibility(View.VISIBLE);
-
             }
         });
-
-//        img.setImageResource(R.drawable.happy);
-
     }
 
     public void showEmotionImage(){
@@ -221,9 +200,11 @@ public class MainActivity extends Activity {
         }
     }
 
+    //sound is the process of emotion ...
     public void startLoading(boolean playSound) {
         if(playSound) {
             final MediaPlayer mp = MediaPlayer.create(MainActivity.this, R.raw.please_wait_while_your_emotion);
+            Log.e("loading", "start sound");
             new Handler(Looper.getMainLooper()).post(new Runnable(){
                 @Override
                 public void run() {
@@ -273,6 +254,7 @@ public class MainActivity extends Activity {
         });
     }
 
+    // custom stop time the ui to display the text longer
     public void setInfoText(final String text, final int time) {
         new Handler(Looper.getMainLooper()).post(new Runnable(){
             @Override
@@ -308,6 +290,8 @@ public class MainActivity extends Activity {
 
     }
 
+    // start sound in another activity to show bar style wave then
+    // tell where the flow should go with nextAction for onActivityResult
     public void startIntentSound(int soundID, String nextAction) {
 //        Intent intent = new Intent(this, SoundVisual.class);
         Intent intent = new Intent(this, SoundVisual.class);
@@ -316,12 +300,6 @@ public class MainActivity extends Activity {
         startActivityForResult(intent, 99);
 //        overridePendingTransition(0, 0);
         overridePendingTransition(R.anim.no_anim, R.anim.no_anim);
-    }
-
-    public void playVideo(View view) {
-        Intent playIntent = new Intent(this, VideoPlayActivity.class);
-        playIntent.putExtra("VideoUri", videoUri.toString());
-        startActivity(playIntent);
     }
 
     public void recordVideo(){
@@ -349,31 +327,36 @@ public class MainActivity extends Activity {
 //                    Log.e("99", "request save video activities");
 //                    Intent intent2 = new Intent(this, SurfaceCamera.class);
 //                    startActivityForResult(intent2, file_server_response_code);
+//                } else if (action.equals(NeutralAction.neutralsound_1.toString())) {
+//                    //end here
+////                    partSoundEnd();
+//                    startIntentSound(getRandomValueFromHashMap(getNeutralHashMap()), "semi_end");
                 } else if (action.equals(NeutralAction.neutralsound_1.toString())) {
                     //end here
 //                    partSoundEnd();
-                    startIntentSound(getRandomValueFromHashMap(getNeutralHashMap()), "semi_end");
+                    tryProcessPick(action);
+//                    startIntentSound(getRandomValueFromHashMap(getNeutralHashMap()), "semi_end");
                 } else if (action.equals(HappyPick)) {
                     tryProcessPick(action);
                 } else if (action.equals(SadPick)) {
                     tryProcessPick(action);
                 } else if (action.equals("repeat_1_happy")) { // repeat pick process
                     recordAudio(HappyPick);
-                } else if (action.equals("repeat_1_sad")) {
+                } else if (action.equals("repeat_1_sad")) { // repeat pick process
                     recordAudio(SadPick);
                 } else if (action.equals("want_more_happy")){
                     playSoundWantMore(HappyPick);
                 } else if (action.equals("want_more_sad")) {
                     playSoundWantMore(SadPick);
                 } else if (action.equals("confirm_happy")){ //confirm as what emotion
+
                     recordAudio(confirmHappy);
                 } else if (action.equals("confirm_sad")){//confirm as what emotion
+
                     recordAudio(confirmSad);
-                } else if (action.equals("confirm_happy")) {//confirm as what emotion
-                    recordAudio(confirmSad);
-                }
-                else if (action.equals("confirm_neutral")){
-                    playSoundEmotion("neutral");
+                } else if (action.equals("confirm_neutral")) {//confirm as what emotion
+
+                    recordAudio(confirmNeutral);
                 } else if (action.equals("repeat_confirm_happy")){
                     playSoundEmotion("happy");
                 } else if (action.equals("repeat_confirm_sad")){
@@ -381,8 +364,10 @@ public class MainActivity extends Activity {
                 } else if (action.equals("emotion_confirm_YN_happy")){
                     soundYesNo("confirm_happy");
                 } else if (action.equals("emotion_confirm_YN_sad")){
+
                     soundYesNo("confirm_sad");
                 } else if (action.equals("emotion_confirm_YN_neutral")){
+
                     soundYesNo("confirm_neutral");
                 } else if(action.equals("end")) {
                     setInfoText("This is the end of the robot.");
@@ -411,37 +396,40 @@ public class MainActivity extends Activity {
 //        startIntentSound(R.raw.no, "videoCapture");
     }
 
+    // if confirmed the emotion, then will proceed
     public void tryProcessPick(String actionString){
 
-        if(actionString.equals(HappyPick)) {
-            processTriggerPick(HappyPick);
-        } else if (actionString.equals(SadPick)){
-            processTriggerPick(SadPick);
-        }
-
-//        if(actionString.equals(HappyAction.happysound_1.toString())) {
-//            if(canProceedConfirm()) processTriggerPick(HappyPick);
-//            else confirmEmotion(confirmHappy);
-//        }else if(actionString.equals(UnHappyAction.unhappysound_1.toString())){
-//            if(canProceedConfirm())  {
-//                mpBgFlower = MediaPlayer.create(MainActivity.this, R.raw.bg_music);
-//                processTriggerPick(SadPick);
-//            }
-//            else confirmEmotion(confirmSad);
+//        if(actionString.equals(HappyPick)) {
+//            processTriggerPick(HappyPick);
+//        } else if (actionString.equals(SadPick)){
+//            processTriggerPick(SadPick);
 //        }
-    }
-
-
-
-    public void confirmEmotion(String emotion){
-        loopOfEmotionFace++;
-        if(emotion.equals(confirmHappy))soundYesNo(HappyAction.happysound_1.toString());
-        else if(emotion.equals(confirmSad))soundYesNo(UnHappyAction.unhappysound_1.toString());
-        else if(emotion.equals(confirmNeutral))soundYesNo(NeutralAction.neutralsound_1.toString());
-//        if(emotion.equals(confirmHappy)) startIntentSound(R.raw.pls_respond_yes_no, "emotion_confirm_YN_happy");
-//        else if(emotion.equals(confirmSad)) startIntentSound(R.raw.pls_respond_yes_no, "emotion_confirm_YN_sad");
-//        else if(emotion.equals(confirmNeutral))startIntentSound(R.raw.pls_respond_yes_no, "emotion_confirm_YN_neutral");
-        else Log.e("error_confirm", "emotion undefined.");
+        Log.e("tryProcessPick", actionString);
+        if(canProceedConfirm()) {
+            if(actionString.equals(HappyPick)) {
+                Log.e("happypick", actionString);
+                processTriggerPick(HappyPick);
+            } else if (actionString.equals(SadPick)){
+                Log.e("sadpick", actionString);
+                processTriggerPick(SadPick);
+            } else if (actionString.equals(NeutralAction.neutralsound_1.toString())) {
+                Log.e("neutral part", "here");
+                startIntentSound(getRandomValueFromHashMap(getNeutralHashMap()), "semi_end");
+            } else {
+                Log.e("error Try", "undefined 1");
+            }
+        } else {
+            loopOfEmotionFace=1;
+            if(actionString.equals(HappyPick)){
+                startIntentSound(R.raw.feel_happy, "emotion_confirm_YN_happy");
+            } else if (actionString.equals(SadPick)){
+                startIntentSound(R.raw.feel_sad, "emotion_confirm_YN_sad");
+            } else if (actionString.equals(NeutralAction.neutralsound_1.toString())) {
+                startIntentSound(R.raw.feel_neutral, "emotion_confirm_YN_neutral");
+            } else {
+                Log.e("error Try 2 ", "undefined 2");
+            }
+        }
     }
 
     public void soundYesNo(String action){
@@ -449,6 +437,7 @@ public class MainActivity extends Activity {
     }
 
     public boolean canProceedConfirm(){
+        Log.e("canProceed", Integer.toString(loopOfEmotionFace));
         if(loopOfEmotionFace > 0 ) return true;
 //        if (!currentEmotion.isEmpty()) return true;
         else return false;
@@ -531,9 +520,11 @@ public class MainActivity extends Activity {
         dos.close();
     }
 
+    // after the return of server process, logic and decide which path to go
     public void processResponse(JSONObject responseJson) throws JSONException {
         Log.d("response place", "response method2");
         updateProgressBar(99);
+        hideEmotionImage();
         stopXMSecForDisplay(1000);
         Log.d("response place", "response method");
         String action = responseJson.get("processed").toString();
@@ -567,22 +558,10 @@ public class MainActivity extends Activity {
                     }
                 });
                 startIntentSound(R.raw.take_flower,"semi_end");
-//                playSoundWantMore(actionType);
             } else {
                 Log.e("testlog2", "sad pick" );
                 playSoundWantMore(actionType);
-
-//                startIntentSound(R.raw.take_cho, "semi_end");
-                //sad
-//                startIntentSound(R.raw.take_flower,"end");
-//                processActionSufficient();
             }
-
-//                            mpBgFlower.stop();
-//                mpBgFlower.release();
-//                playSoundWantMore(actionType);
-//            startIntentSound(R.raw.take_flower, "semi_end");
-
 
         } else if(action.equals("api_speech")){
             stopLoading();
@@ -602,41 +581,24 @@ public class MainActivity extends Activity {
                 } else if(actionType.equals(SadPick)) {
                     processActionWantMore(actionType);
                 } else {
+                    processConfirmAs("yes", actionType);
                     // do the check confirm
                 }
 
             }else if(result.equals("2")){
                 processLoading(false, "Detected speech as NO", false);
-//                setInfoText("Detected speech as NO");
-//                if(isActionConfirm(actionType))processConfirmAs("no", actionType);
-////                else processActionSufficient(actionType);
-//                else partSoundEnd();
 
                 if(actionType.equals(HappyPick)) {
                     startIntentSound(R.raw.take_flower,"semi_end");
                 } else if(actionType.equals(SadPick)) {
                     startIntentSound(R.raw.take_cho,"semi_end");
                 } else {
+                    processConfirmAs("no", actionType);
                     // do the check confirm
                 }
             }
             else {
                 processLoading(false, "Could not recognize speech as YES or NO", false);
-//                if(isActionConfirm(actionType))processConfirmAs("fail", actionType);
-////                setInfoText("Could not recognize speech as YES or NO");
-//                //could not detect properly
-//                else {
-//                        final String finalActionType = actionType;
-//                    new Timer().schedule(new TimerTask() {
-//                        @Override
-//                        public void run() {
-//
-//                            // run AsyncTask here.
-//                            processActionRepeatVoice(finalActionType);
-//                        }
-//                    }, 5000);
-//                }
-
                 if(actionType.equals(HappyPick)) {
                     final String finalActionType = actionType;
                     new Timer().schedule(new TimerTask() {
@@ -656,7 +618,9 @@ public class MainActivity extends Activity {
                             // run AsyncTask here.
                             processActionRepeatVoice(finalActionType);
                         }
-                    }, 5000);                } else {
+                    }, 5000);                }
+                else {
+                    processConfirmAs("fail", actionType);
                     // do the check confirm
                 }
             }
@@ -665,57 +629,60 @@ public class MainActivity extends Activity {
         }
     }
 
-    public boolean isActionConfirm(String actionType){
-        if(actionType.equals(confirmHappy)) return true;
-        else if (actionType.equals(confirmSad)) return true;
-        else if (actionType.equals(confirmNeutral)) return true;
-        return false;
-    }
-
     public void processConfirmAs(String detectAnswer, String actionType){
+        Log.e("processConfirmAs", actionType);
+
         if(detectAnswer.equals("yes")) {
-            if(actionType.equals(confirmHappy)) startIntentSound(R.raw.your_emotion_is_happy, HappyAction.happysound_1.toString());
+            if(actionType.equals(confirmHappy)) startIntentSound(R.raw.your_emotion_is_happy, HappyPick);
 //                processTriggerPick(HappyPick);
-            else if (actionType.equals(confirmSad)) startIntentSound(R.raw.your_emotion_is_sad, UnHappyAction.unhappysound_1.toString());
+            else if (actionType.equals(confirmSad)) startIntentSound(R.raw.your_emotion_is_sad, SadPick);
 //                processTriggerPick(SadPick);
             else if (actionType.equals(confirmNeutral)) partNeutral();
         } else if (detectAnswer.equals("no")){
+//            loopOfEmotionFace=1;
             recordVideo();
+
 //            introCaptureVideo();
         } else if (detectAnswer.equals("fail")) {
-            loopOfEmotionFace--;
-            if(actionType.equals(confirmHappy))soundYesNo("confirm_happy");
-            if(actionType.equals(confirmSad))soundYesNo("confirm_sad");
-            if(actionType.equals(confirmNeutral))soundYesNo("confirm_neutral");
+//            loopOfEmotionFace = 0;
+            if(actionType.equals(confirmHappy))
+//                HappyPick
 
-//            if (actionType.equals(confirmHappy)) startIntentSound(R.raw.we_cannot_detect, "repeat_confirm_happy");
-//            if (actionType.equals(confirmSad)) startIntentSound(R.raw.we_cannot_detect, "repeat_confirm_sad");
-//            if (actionType.equals(confirmNeutral)) startIntentSound(R.raw.we_cannot_detect, "repeat_confirm_neutral");
+                soundYesNo(HappyPick);
+//                soundYesNo("confirm_happy");
+//            soundYesNo("confirm_happy");
+            if(actionType.equals(confirmSad))
+//                soundYesNo("confirm_sad");
+                soundYesNo(SadPick);
+//                soundYesNo("confirm_sad");
+            if(actionType.equals(confirmNeutral))
+//                soundYesNo("confirm_neutral");
+                soundYesNo(NeutralAction.neutralsound_1.toString());
+
         }
     }
 
+    // trigger robot arm pick by calling server
     public void
     processTriggerPick(String action){
 //        if(action.equals(Emotion.unhappy.toString())) {
+        Log.e("processTriggerPick", action);
 
         if(action.equals(SadPick)) {
-            //function to move robot arm etc
             new asyncRequestPick(action).execute(); // should be do in function to move robot arm
 
-//        }else if (action.equals(Emotion.happy.toString())) {
         }else if (action.equals(HappyPick)) {
             mpBgFlower = MediaPlayer.create(MainActivity.this, R.raw.bg_music);
             mpBgFlower.start();
-            //function to move robot arm etc
-            //do the retrigger the mediarecorder
             new asyncRequestPick(action).execute(); // should be do in function to move robot arm
 
         } else {
-            Log.e("processtMoreFail", "1234");
+            Log.e("processTriggerPick", "1234");
         }
     }
 
     public void processActionWantMore(final String action) {
+        Log.e("processActionW", action);
         tryProcessPick(action);
 //        startIntentSound(R.raw.yes_more, action.equals(Emotion.happy.toString()) ? HappyAction.happysound_1.toString() : UnHappyAction.unhappysound_1.toString());
     }
@@ -757,10 +724,13 @@ public class MainActivity extends Activity {
 
 
     public void processActionRepeatVoice(final String action){
-        if(action.equals(HappyPick)) startIntentSound(R.raw.please_repeat, "want_more_happy");
-        else startIntentSound(R.raw.please_repeat, "want_more_sad");
+        Log.e("actionRepeat", action);
+        if(action.equals(HappyPick)) startIntentSound(R.raw.we_cannot_detect, "want_more_happy");
+        else startIntentSound(R.raw.we_cannot_detect, "want_more_sad");
     }
 
+    //send file to the server and the paramater as action if got
+    // the file send will be the filepath
     public class sendFilesToServerAsync extends AsyncTask<String, Integer, Void> {
 
         String action;
@@ -836,6 +806,7 @@ public class MainActivity extends Activity {
         }
     }
 
+    // diff from file because this want sound
     public class sendVideoToServerAsync extends AsyncTask<String, Integer, Void> {
 
         String action;
@@ -910,7 +881,7 @@ public class MainActivity extends Activity {
         }
     }
 
-
+    // permission needed for this project apk
     public void initPermisison(){
         if (Build.VERSION.SDK_INT >= 23) {
             int REQUEST_CODE_CONTACT = 101;
@@ -1081,7 +1052,7 @@ public class MainActivity extends Activity {
         HashMap<String, Integer> actions = new HashMap<String, Integer>();
         actions.put(Emotion.happy.toString(), R.raw.your_emotion_is_happy);
         actions.put(Emotion.unhappy.toString(), R.raw.your_emotion_is_sad);
-        actions.put(Emotion.repeat.toString(), R.raw.please_repeat);
+        actions.put(Emotion.repeat.toString(), R.raw.we_cannot_detect);
         actions.put(Emotion.more.toString(), R.raw.want_more);
         actions.put(Emotion.yesMore.toString(), R.raw.yes_more);
         actions.put(Emotion.neutral.toString(), R.raw.your_emotion_is_neutral);
@@ -1105,6 +1076,7 @@ public class MainActivity extends Activity {
         return happySoundMap;
     }
 
+    // sound files prepare to be random called
     public HashMap getNeutralHashMap(){
         HashMap<String, Integer> neutralSoundMap = new HashMap<String, Integer>();
         neutralSoundMap.put("q_!", R.raw.q_1);
@@ -1120,6 +1092,8 @@ public class MainActivity extends Activity {
         return neutralSoundMap;
     }
 
+    // in android, file is actually the integer of the R.raw.(int)
+    // so this is android
     public int getRandomValueFromHashMap(HashMap soundMap){
         List<Integer> valuesList = new ArrayList<Integer>(soundMap.values());
         int randomIndex = new Random().nextInt(valuesList.size());

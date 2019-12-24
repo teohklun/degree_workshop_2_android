@@ -24,8 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".SoundTest"></activity>
-<!--        <activity android:name=".soundTest" />-->
+        <!--        <activity android:name=".soundTest" />-->
 
 <!--        android:screenOrientation="landscape"-->
 
@@ -40,15 +39,6 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             />
-        <activity android:name=".CustomVideoCamera" />
-        <activity android:name=".VideoPlayActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />

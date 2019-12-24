@@ -129,8 +129,8 @@ public class SurfaceCamera extends AppCompatActivity implements SurfaceHolder.Ca
 
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
         //       mMediaRecorder.setOutputFormat(8);
-//        mMediaRecorder.setMaxDuration(5000);
-        mMediaRecorder.setMaxDuration(1000);
+        mMediaRecorder.setMaxDuration(5000);
+//        mMediaRecorder.setMaxDuration(1000);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setVideoEncodingBitRate(512 * 1000);
